@@ -1,4 +1,4 @@
-module github.com/jinzhu/gorm
+module github.com/Ewan-Walker/gorm
 
 require (
 	cloud.google.com/go v0.36.0 // indirect
