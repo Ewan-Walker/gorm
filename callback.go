@@ -14,6 +14,7 @@ var DefaultCallback = &Callback{}
 //   Field `processors` contains all callback processors, will be used to generate above callbacks in order
 type Callback struct {
 	creates    []*func(scope *Scope)
+	createsb   []*func(scope *Scope)
 	updates    []*func(scope *Scope)
 	deletes    []*func(scope *Scope)
 	queries    []*func(scope *Scope)
@@ -54,6 +55,10 @@ func (c *Callback) clone() *Callback {
 //     })
 func (c *Callback) Create() *CallbackProcessor {
 	return &CallbackProcessor{kind: "create", parent: c}
+}
+
+func (c *Callback) CreateBatch() *CallbackProcessor {
+	return &CallbackProcessor{kind: "createsb", parent: c}
 }
 
 // Update could be used to register callbacks for updating object, refer `Create` for usage
@@ -215,7 +220,7 @@ func sortProcessors(cps []*CallbackProcessor) []*func(scope *Scope) {
 
 // reorder all registered processors, and reset CRUD callbacks
 func (c *Callback) reorder() {
-	var creates, updates, deletes, queries, rowQueries []*CallbackProcessor
+	var creates, updates, deletes, queries, rowQueries, createsb []*CallbackProcessor
 
 	for _, processor := range c.processors {
 		if processor.name != "" {
@@ -230,6 +235,8 @@ func (c *Callback) reorder() {
 				queries = append(queries, processor)
 			case "row_query":
 				rowQueries = append(rowQueries, processor)
+			case "createsb":
+				createsb = append(createsb, processor)
 			}
 		}
 	}
@@ -239,4 +246,5 @@ func (c *Callback) reorder() {
 	c.deletes = sortProcessors(deletes)
 	c.queries = sortProcessors(queries)
 	c.rowQueries = sortProcessors(rowQueries)
+	c.createsb = sortProcessors(createsb)
 }

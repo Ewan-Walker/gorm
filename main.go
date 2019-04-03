@@ -457,6 +457,12 @@ func (s *DB) Create(value interface{}) *DB {
 	return scope.callCallbacks(s.parent.callbacks.creates).db
 }
 
+func (s *DB) CreateBatch(values ...interface{}) *DB {
+	scope := s.clone().NewScope(s.Value)
+	scope.Set("all", values)
+	return scope.callCallbacks(s.parent.callbacks.createsb).db
+}
+
 // Delete delete value match given conditions, if the value has primary key, then will including the primary key as condition
 func (s *DB) Delete(value interface{}, where ...interface{}) *DB {
 	return s.NewScope(value).inlineCondition(where...).callCallbacks(s.parent.callbacks.deletes).db
